@@ -100,7 +100,7 @@ const stmts = {
   
   // Votos
   createVote: db.prepare('INSERT INTO votes (type, description, options, ends_at) VALUES (?, ?, ?, ?)'),
-  getActiveVotes: db.prepare('SELECT * FROM votes WHERE active = 1 AND ends_at > datetime("now")'),
+  getActiveVotes: db.prepare("SELECT * FROM votes WHERE active = 1 AND ends_at > datetime('now')"),
   updateVoteData: db.prepare('UPDATE votes SET votes = ? WHERE id = ?'),
   closeVote: db.prepare('UPDATE votes SET active = 0 WHERE id = ?'),
   
