@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nightfall Society</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Tela de Login */
+    #loginScreen {
+      background: rgba(0, 0, 0, 0.85);
+      padding: 40px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    #loginScreen h1 {
+      color: #fff;
+      margin-bottom: 10px;
+      font-size: 2em;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    #loginScreen p {
+      color: #aaa;
+      margin-bottom: 30px;
+    }
+
+    #loginScreen input {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      border: 2px solid #3498DB;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    #loginScreen input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #2ECC71;
+    }
+
+    #loginScreen button {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+    }
+
+    #loginBtn {
+      background: linear-gradient(135deg, #2ECC71, #27AE60);
+      color: white;
+    }
+
+    #loginBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(46, 204, 113, 0.4);
+    }
+
+    #registerBtn {
+      background: linear-gradient(135deg, #3498DB, #2980B9);
+      color: white;
+    }
+
+    #registerBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+    }
+
+    #errorMsg {
+      color: #E74C3C;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    /* Interface do Jogo */
+    #gameContainer {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background: #000;
+    }
+
+    #gameCanvas {
+      display: block;
+      background: #1a1a1a;
+    }
+
+    /* HUD */
+    #hud {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px 20px;
+      border-radius: 10px;
+      color: white;
+      font-size: 16px;
+      border: 2px solid #3498DB;
+    }
+
+    #hud div {
+      margin: 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stat-label {
+      font-weight: bold;
+      color: #3498DB;
+    }
+
+    .stat-value {
+      color: #2ECC71;
+    }
+
+    #hpBar {
+      width: 150px;
+      height: 20px;
+      background: #333;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid #E74C3C;
+    }
+
+    #hpBarFill {
+      height: 100%;
+      background: linear-gradient(90deg, #E74C3C, #C0392B);
+      transition: width 0.3s;
+    }
+
+    /* Fase do Dia */
+    #phaseIndicator {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px 25px;
+      border-radius: 10px;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      border: 2px solid #FFD700;
+      min-width: 150px;
+    }
+
+    .phase-day { border-color: #FFD700; color: #FFD700; }
+    .phase-dusk { border-color: #FF6B6B; color: #FF6B6B; }
+    .phase-night { border-color: #8B00FF; color: #8B00FF; }
+
+    /* Chat */
+    #chatContainer {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 400px;
+      height: 300px;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 10px;
+      border: 2px solid #3498DB;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #chatTabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.5);
+      border-bottom: 2px solid #3498DB;
+    }
+
+    .chat-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .chat-tab:hover {
+      background: rgba(52, 152, 219, 0.2);
+    }
+
+    .chat-tab.active {
+      background: #3498DB;
+      color: white;
+      font-weight: bold;
+    }
+
+    #chatMessages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      color: white;
+      font-size: 13px;
+    }
+
+    .chat-message {
+      margin: 5px 0;
+      word-wrap: break-word;
+    }
+
+    .chat-username {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    #chatInput {
+      display: flex;
+      padding: 10px;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    #chatInput input {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #3498DB;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    #chatInput button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: #3498DB;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #chatInput button:hover {
+      background: #2980B9;
+    }
+
+    /* Notificações */
+    #notifications {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      width: 300px;
+      z-index: 1000;
+    }
+
+    .notification {
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      color: white;
+      animation: slideIn 0.3s ease;
+      border-left: 4px solid #3498DB;
+    }
+
+    .notification.success { border-left-color: #2ECC71; }
+    .notification.warning { border-left-color: #F39C12; }
+    .notification.error { border-left-color: #E74C3C; }
+    .notification.legendary { 
+      border-left-color: #FFD700; 
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Inventário */
+    #inventory {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 15px;
+      border-radius: 10px;
+      border: 2px solid #3498DB;
+    }
+
+    #inventorySlots {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      gap: 5px;
+    }
+
+    .inventory-slot {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid #555;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .inventory-slot:hover {
+      border-color: #3498DB;
+      background: rgba(52, 152, 219, 0.2);
+    }
+
+    .inventory-slot img {
+      max-width: 80%;
+      max-height: 80%;
+    }
+
+    /* Scrollbar customizada */
+    #chatMessages::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #chatMessages::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    #chatMessages::-webkit-scrollbar-thumb {
+      background: #3498DB;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Tela de Login -->
+  <div id="loginScreen">
+    <h1>🌙 Nightfall Society</h1>
+    <p>Sobreviva à noite. Construa uma sociedade.</p>
+    
+    <input type="text" id="usernameInput" placeholder="Usuário" maxlength="20">
+    <input type="password" id="passwordInput" placeholder="Senha" maxlength="50">
+    
+    <button id="loginBtn">Entrar</button>
+    <button id="registerBtn">Criar Conta</button>
+    
+    <div id="errorMsg"></div>
+  </div>
+
+  <!-- Interface do Jogo -->
+  <div id="gameContainer">
+    <canvas id="gameCanvas"></canvas>
+    
+    <!-- HUD -->
+    <div id="hud">
+      <div>
+        <span class="stat-label">Player:</span>
+        <span class="stat-value" id="playerName">-</span>
+      </div>
+      <div>
+        <span class="stat-label">HP:</span>
+        <div id="hpBar">
+          <div id="hpBarFill" style="width: 100%"></div>
+        </div>
+        <span class="stat-value" id="hpText">100/100</span>
+      </div>
+      <div>
+        <span class="stat-label">💎 Gems:</span>
+        <span class="stat-value" id="gemsCount">0</span>
+      </div>
+      <div>
+        <span class="stat-label">Rank:</span>
+        <span class="stat-value" id="playerRank">Cidadão</span>
+      </div>
+      <div>
+        <span class="stat-label">⚔️ Zumbis:</span>
+        <span class="stat-value" id="zombiesKilled">0</span>
+      </div>
+    </div>
+
+    <!-- Indicador de Fase -->
+    <div id="phaseIndicator" class="phase-day">
+      ☀️ DIA
+    </div>
+
+    <!-- Notificações -->
+    <div id="notifications"></div>
+
+    <!-- Chat -->
+    <div id="chatContainer">
+      <div id="chatTabs">
+        <div class="chat-tab active" data-channel="geral">#geral</div>
+        <div class="chat-tab" data-channel="comercio">#comercio</div>
+        <div class="chat-tab" data-channel="emergencia">#emergencia</div>
+      </div>
+      <div id="chatMessages"></div>
+      <div id="chatInput">
+        <input type="text" id="chatMessageInput" placeholder="Digite sua mensagem..." maxlength="200">
+        <button id="sendChatBtn">Enviar</button>
+      </div>
+    </div>
+
+    <!-- Inventário -->
+    <div id="inventory">
+      <div id="inventorySlots">
+        <div class="inventory-slot"></div>
+        <div class="inventory-slot"></div>
+        <div class="inventory-slot"></div>
+        <div class="inventory-slot"></div>
+        <div class="inventory-slot"></div>
+        <div class="inventory-slot"></div>
+        <div class="inventory-slot"></div>
+        <div class="inventory-slot"></div>
+        <div class="inventory-slot"></div>
+        <div class="inventory-slot"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+  <script src="chat.js"></script>
+</body>
+</html>
