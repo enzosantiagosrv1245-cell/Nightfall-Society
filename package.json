@@ -1,0 +1,31 @@
+{
+  "name": "nightfall-society",
+  "version": "1.0.0",
+  "description": "MMO de sobrevivência social com ciclos dia/noite e defesa contra zumbis",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "mmo",
+    "websocket",
+    "survival",
+    "multiplayer"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "bcrypt": "^5.1.1",
+    "better-sqlite3": "^9.2.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
